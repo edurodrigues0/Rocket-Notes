@@ -1,11 +1,9 @@
 import { Router } from 'express'
+import UsersController from '../controllers/users-controllers'
 
 const usersRouter = Router()
+const usersController = new UsersController()
 
-usersRouter.post('/', (request, response) => {
-  const { name, email, password } = request.body
-
-  response.json({ name, email, password })
-})
+usersRouter.post('/', usersController.create)
 
 export default usersRouter
