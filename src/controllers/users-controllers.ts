@@ -1,6 +1,7 @@
 import { Request, Response } from 'express'
 import { AppError } from '../utils/errors/AppError'
 import { sqliteConnection } from '../database/sqlite';
+import { hash } from 'bcryptjs'
 import { v4 as uuidv4 } from 'uuid'
 
 class UsersController {
@@ -18,11 +19,11 @@ class UsersController {
     }
 
     const id = uuidv4()
-    console.log(id)
+    const hashedPassword = await hash(password, 6);
 
     await database.run(
       'INSERT INTO users (id, name, email, password) VALUES (?, ?, ?, ?)',
-      [id, name, email, password]
+      [id, name, email, hashedPassword]
     )
 
     response.status(201).json()
