@@ -9,6 +9,11 @@ export const config: Knex.Config = {
       } 
     : env.DATABASE_URL,
   useNullAsDefault: true,
+  pool: {
+    afterCreate: (conn: any, cb: any) => {
+      conn.run('PRAGMA foreign_keys = ON', cb)
+    }
+  },
   migrations: {
     extension: 'ts',
     directory: './src/database/knex/migrations',
