@@ -74,6 +74,18 @@ class NotesController {
       links
     })
   }
+
+  async delete(request: Request, response: Response) {
+    const deleteParamsSchema = z.object({
+      id: z.string().uuid()
+    })
+
+    const { id } = deleteParamsSchema.parse(request.params)
+
+    await knex("notes").where({ id }).delete()
+
+    return response.json()
+  }
 }
 
 export default NotesController
