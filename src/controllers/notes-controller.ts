@@ -89,12 +89,14 @@ class NotesController {
 
   async index(request: Request, response: Response) {
     const indexQuerySchema = z.object({
-      user_id: z.string().uuid()
+      user_id: z.string().uuid(),
+      title: z.string().optional()
     })
-    const { user_id } = indexQuerySchema.parse(request.query)
+    const { user_id, title } = indexQuerySchema.parse(request.query)
 
     const notes = await knex("notes")
-    .where({ user_id })
+    .where({ user_id})
+    .whereLike("title", `%${title}%`)
     .orderBy("title")
 
     return response.json(notes)
