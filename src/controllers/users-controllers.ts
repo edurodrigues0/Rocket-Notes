@@ -18,7 +18,7 @@ class UsersController {
     const checkUserExists = await knex('users').where('email', email).first()
 
     if(checkUserExists) {
-      throw new AppError('E-mail já está em uso.')
+      throw new AppError('E-mail já está em uso.', 409)
     }
 
     const id = uuidv4()

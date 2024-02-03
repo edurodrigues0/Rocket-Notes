@@ -2,6 +2,7 @@ import { z } from 'zod'
 import { knex } from '../database'
 import { Request, Response } from 'express'
 import { v4 as uuidv4 } from 'uuid'
+import { AppError } from '../utils/errors/AppError'
 
 class NotesController {
   async create(request: Request, response: Response) {
@@ -25,6 +26,12 @@ class NotesController {
     const { user_id } = createNotesParamsSchema.parse(request.params)
 
     const id = uuidv4()
+
+    const user = await knex("users").where({ id: user_id }).first()
+
+    if (!user) {
+      throw new AppError("Usuário não encontrado.", 404)
+    }
 
     await knex('notes').insert({
       id,
@@ -54,7 +61,7 @@ class NotesController {
 
     await knex('tags').insert(tagsInsert)
 
-    response.json();
+    response.status(201).json();
   }
 
   async show(request: Request, response: Response) {
@@ -84,7 +91,7 @@ class NotesController {
 
     await knex("notes").where({ id }).delete()
 
-    return response.json()
+    return response.status(204).json()
   }
 
   async index(request: Request, response: Response) {
@@ -94,6 +101,12 @@ class NotesController {
       tags: z.string().optional()
     })
     const { user_id, title, tags } = indexQuerySchema.parse(request.query)
+    
+    const user = await knex("users").where({ id: user_id }).first()
+
+    if (!user) {
+      throw new AppError("Usuário não encontrado.", 404)
+    }
 
     let notes
 
