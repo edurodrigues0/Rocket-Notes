@@ -86,6 +86,19 @@ class NotesController {
 
     return response.json()
   }
+
+  async index(request: Request, response: Response) {
+    const indexQuerySchema = z.object({
+      user_id: z.string().uuid()
+    })
+    const { user_id } = indexQuerySchema.parse(request.query)
+
+    const notes = await knex("notes")
+    .where({ user_id })
+    .orderBy("title")
+
+    return response.json(notes)
+  }
 }
 
 export default NotesController
