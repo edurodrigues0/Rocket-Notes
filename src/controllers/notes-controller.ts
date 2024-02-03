@@ -90,14 +90,46 @@ class NotesController {
   async index(request: Request, response: Response) {
     const indexQuerySchema = z.object({
       user_id: z.string().uuid(),
-      title: z.string().optional()
+      title: z.string().optional(),
+      tags: z.string().optional()
     })
-    const { user_id, title } = indexQuerySchema.parse(request.query)
+    const { user_id, title, tags } = indexQuerySchema.parse(request.query)
 
-    const notes = await knex("notes")
-    .where({ user_id})
-    .whereLike("title", `%${title}%`)
-    .orderBy("title")
+    let notes
+
+    if (tags) {
+      const filterTags = tags.split(',').map(tag => tag.trim())
+      notes = await knex("tags")
+      .select([
+        "notes.id",
+        "notes.title",
+        "notes.user_id",
+      ])
+      .where("notes.user_id", user_id)
+      .modify(builder => {
+        if (title) {
+          builder.whereLike("notes.title", `%${title}%`)
+        }
+      })
+      .whereIn("name", filterTags)
+      .innerJoin("notes", "notes.id", "tags.note_id")
+      .orderBy("notes.title")
+    } else {
+      notes = await knex("notes")
+      .modify(builder => {
+        if (title) {
+          builder.whereLike("title", `%${title}%`)
+        }
+      })
+      .where({ user_id })
+      .select([
+        "id",
+        "title",
+        "user_id",
+      ])
+      .orderBy("title")
+    }
+
 
     return response.json(notes)
   }
