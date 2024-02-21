@@ -13,17 +13,13 @@ class NotesController {
       links: z.string().array()
     })
 
-    const createNotesParamsSchema = z.object({
-      user_id: z.string(),
-    })
-
     const { 
       title, 
       description, 
       tags, 
       links 
     } = createNotesBodySchema.parse(request.body)
-    const { user_id } = createNotesParamsSchema.parse(request.params)
+    const user_id = request.user.id
 
     const id = uuidv4()
 
@@ -100,7 +96,8 @@ class NotesController {
       title: z.string().optional(),
       tags: z.string().optional()
     })
-    const { user_id, title, tags } = indexQuerySchema.parse(request.query)
+    const user_id = request.user.id
+    const { title, tags } = indexQuerySchema.parse(request.query)
     
     const user = await knex("users").where({ id: user_id }).first()
 

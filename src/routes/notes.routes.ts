@@ -1,10 +1,13 @@
 import { Router } from 'express'
 import NotesController from '../controllers/notes-controller'
+import { ensureAuthenticated } from '../middlewares/ensureAuthenticated'
 
 const notesRouter = Router()
 const notesController = new NotesController()
 
-notesRouter.post('/:user_id', notesController.create)
+notesRouter.use(ensureAuthenticated)
+
+notesRouter.post('/', notesController.create)
 notesRouter.get('/:id', notesController.show)
 notesRouter.delete('/:id', notesController.delete)
 notesRouter.get('/', notesController.index)

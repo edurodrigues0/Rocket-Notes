@@ -43,9 +43,7 @@ class UsersController {
       avatar: z.string().optional()
     })
 
-    const updateUserParamsSchema = z.object({
-      id: z.string(),
-    })
+    const { id } = request.user
 
 
     const { 
@@ -55,7 +53,6 @@ class UsersController {
       old_password, 
       avatar 
     } = updateUserBodySchema.parse(request.body)
-    const { id } = updateUserParamsSchema.parse(request.params)
 
     const user = await knex('users').where('id', id).first()
 
